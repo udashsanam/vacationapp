@@ -13,6 +13,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.pradhan.vacationapp.R;
@@ -38,6 +39,11 @@ public class VacationList extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+
+        // Handle back button click
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
         System.out.println(getIntent().getStringExtra("test"));
     }
 
