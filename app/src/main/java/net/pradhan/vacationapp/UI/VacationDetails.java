@@ -40,7 +40,7 @@ public class VacationDetails extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(VacationDetails.this, HotelDetails.class);
+                Intent intent = new Intent(VacationDetails.this, ExcursionDetails.class);
                 startActivity(intent);
             }
         });

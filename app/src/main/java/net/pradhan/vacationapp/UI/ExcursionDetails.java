@@ -1,6 +1,7 @@
 package net.pradhan.vacationapp.UI;
 
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,17 +11,28 @@ import androidx.core.view.WindowInsetsCompat;
 
 import net.pradhan.vacationapp.R;
 
-public class HotelDetails extends AppCompatActivity {
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
+public class ExcursionDetails extends AppCompatActivity {
+
+    TextView startDateText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_hotel_details);
+        setContentView(R.layout.activity_excursion_details);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        String currentDate = new SimpleDateFormat("MM/dd/yy", Locale.getDefault())
+                .format(Calendar.getInstance().getTime());
+        startDateText = findViewById(R.id.startDateText);
+        startDateText.setText(currentDate);
+
+
     }
 }
