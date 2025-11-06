@@ -54,7 +54,7 @@ public class VacationList extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==R.id.mysample) {
+        if(item.getItemId()==R.id.saveExcursion) {
             Toast.makeText(VacationList.this, "put in sample data", Toast.LENGTH_LONG).show();
             return true;
         }
