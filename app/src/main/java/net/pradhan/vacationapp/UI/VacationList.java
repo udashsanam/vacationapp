@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,8 +20,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.pradhan.vacationapp.R;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class VacationList extends AppCompatActivity {
 
+    LinearLayout vacationListContainer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +50,23 @@ public class VacationList extends AppCompatActivity {
 
         // Handle back button click
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
+
+        vacationListContainer = findViewById(R.id.vacationListContainer);
+        // Example dynamic vacation list
+        List<String> vacations = Arrays.asList("Miami", "Denver", "Las Vegas", "New York", "Hawaii");
+
+        for (String place : vacations) {
+            TextView textView = new TextView(this);
+            textView.setText(place);
+            textView.setTextSize(16);
+            textView.setPadding(0, 8, 0, 8);
+            textView.setOnClickListener(v -> {
+                Intent intent = new Intent(this, VacationDetails.class);
+                intent.putExtra("Detail", place);
+                startActivity(intent);
+            });
+            vacationListContainer.addView(textView);
+        }
         System.out.println(getIntent().getStringExtra("test"));
     }
 

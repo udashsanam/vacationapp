@@ -64,6 +64,9 @@ public class VacationDetails extends AppCompatActivity {
 
         startDateText.setOnClickListener(v -> showDatePicker(startDateText));
         endDateText.setOnClickListener(v -> showDatePicker(endDateText));
+
+        String holidayName = getIntent().getStringExtra("Detail");
+        System.out.println("fromintext" + holidayName);
     }
 
     private void showDatePicker(TextView targetView) {
