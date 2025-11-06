@@ -10,7 +10,7 @@
         android:id="@+id/topAppBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
+        android:background="#EDEDED"
         app:title="Vacations"
         app:titleCentered="false"
         app:navigationIcon="@drawable/baseline_arrow_back_24"
