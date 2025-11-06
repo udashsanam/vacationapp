@@ -17,9 +17,13 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.pradhan.vacationapp.R;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 public class VacationDetails extends AppCompatActivity {
+
+    TextView startDateText, endDateText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +48,19 @@ public class VacationDetails extends AppCompatActivity {
 
         // Handle back button click
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
-        TextView startDateText, endDateText;
         startDateText = findViewById(R.id.startDateText);
         endDateText = findViewById(R.id.endDateText);
+        // 🗓️ Set current date by default
+        String currentDate = new SimpleDateFormat("MM/dd/yy", Locale.getDefault())
+                .format(Calendar.getInstance().getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 1); // add 1 day
+
+        String tomorrowDate = new SimpleDateFormat("MM/dd/yy", Locale.getDefault())
+                .format(calendar.getTime());
+
+        startDateText.setText(currentDate);
+        endDateText.setText(tomorrowDate);
 
         startDateText.setOnClickListener(v -> showDatePicker(startDateText));
         endDateText.setOnClickListener(v -> showDatePicker(endDateText));
