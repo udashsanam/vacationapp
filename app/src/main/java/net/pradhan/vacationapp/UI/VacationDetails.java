@@ -150,8 +150,9 @@ public class VacationDetails extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
         toolbar.setOnMenuItemClickListener(item -> {
             if(R.id.saveVacation == item.getItemId()){
-                if(vacationId==0){
+
                     Vacation vacation = new Vacation();
+                    vacation.setVacationId(vacationId);
                     vacation.setTitle(editTextTitle.getText().toString().trim());
                     vacation.setHotel(editTextHotel.getText().toString().trim());
                     vacation.setStartDate(startDateText.getText().toString().trim());
@@ -161,7 +162,7 @@ public class VacationDetails extends AppCompatActivity {
                     startActivity(intent);
                     finish(); // removes current screen from back stack
 
-                }
+
                 return  true;
             }
             if(R.id.deleteVacation == item.getItemId()){
