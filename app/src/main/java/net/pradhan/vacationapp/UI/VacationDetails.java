@@ -157,9 +157,24 @@ public class VacationDetails extends AppCompatActivity {
                     vacation.setStartDate(startDateText.getText().toString().trim());
                     vacation.setEndDate(endDateText.getText().toString().trim());
                     repository.insert(vacation);
+                    Intent intent = new Intent(this, VacationList.class);
+                    startActivity(intent);
+                    finish(); // removes current screen from back stack
 
                 }
                 return  true;
+            }
+            if(R.id.deleteVacation == item.getItemId()){
+                if(vacationId!=0){
+                    Vacation vacation = new Vacation();
+                    vacation.setVacationId(vacationId);
+                    repository.deleteVacation(vacation);
+                    Intent intent = new Intent(this, VacationList.class);
+                    startActivity(intent);
+                    finish(); // removes current screen from back stack
+
+                }
+                return true;
             }
             return  false;
 

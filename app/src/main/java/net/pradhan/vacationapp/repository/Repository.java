@@ -68,11 +68,11 @@ public class Repository {
         databaseExecutor.execute(() -> {
             vacationDAO.delete(vacation);
         });
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void insertExcursion(Excursion excursion){
