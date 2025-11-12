@@ -19,13 +19,17 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.pradhan.vacationapp.R;
+import net.pradhan.vacationapp.entities.Vacation;
+import net.pradhan.vacationapp.repository.Repository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class VacationList extends AppCompatActivity {
 
     LinearLayout vacationListContainer;
+    Repository repository;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,17 +56,24 @@ public class VacationList extends AppCompatActivity {
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
 
         vacationListContainer = findViewById(R.id.vacationListContainer);
+        repository = new Repository(getApplication());
         // Example dynamic vacation list
-        List<String> vacations = Arrays.asList("Miami", "Denver", "Las Vegas", "New York", "Hawaii");
+//        List<String> vacations = Arrays.asList("Miami", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii"
+//                , "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii");
+       List<Vacation> vacations = repository.getVacationList();
 
-        for (String place : vacations) {
+        for (Vacation place : vacations) {
             TextView textView = new TextView(this);
-            textView.setText(place);
+            textView.setText(place.getTitle());
             textView.setTextSize(16);
             textView.setPadding(0, 8, 0, 8);
             textView.setOnClickListener(v -> {
                 Intent intent = new Intent(this, VacationDetails.class);
-                intent.putExtra("Detail", place);
+                intent.putExtra("vacationId", place.getVacationId());
+                intent.putExtra("title", place.getTitle());
+                intent.putExtra("hotel", place.getHotel());
+                intent.putExtra("startDate", place.getStartDate());
+                intent.putExtra("endDate", place.getEndDate());
                 startActivity(intent);
             });
             vacationListContainer.addView(textView);
@@ -74,7 +85,6 @@ public class VacationList extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_vacation_list, menu);
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.saveExcursion) {

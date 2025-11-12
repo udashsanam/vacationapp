@@ -41,4 +41,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    val room_version = "2.4.3" // latest stable as of 2025
+
+    implementation("androidx.room:room-runtime:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+    testImplementation("androidx.room:room-testing:$room_version")
 }

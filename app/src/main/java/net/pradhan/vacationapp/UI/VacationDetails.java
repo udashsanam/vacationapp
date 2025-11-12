@@ -4,11 +4,14 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -18,22 +21,30 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.pradhan.vacationapp.R;
+import net.pradhan.vacationapp.entities.Excursion;
+import net.pradhan.vacationapp.entities.Vacation;
+import net.pradhan.vacationapp.repository.Repository;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class VacationDetails extends AppCompatActivity {
 
     TextView startDateText, endDateText;
+
+    EditText editTextTitle,editTextHotel;
     LinearLayout excursionListContainer;
+
+    Repository repository;
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        repository = new Repository(getApplication());
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_vacation_details);
@@ -51,12 +62,12 @@ public class VacationDetails extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
 
-        // Handle back button click
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        // handle buttn click
         startDateText = findViewById(R.id.startDateText);
         endDateText = findViewById(R.id.endDateText);
+        editTextTitle = findViewById(R.id.titletext);
+        editTextHotel = findViewById(R.id.hotelText);
         // 🗓️ Set current date by default
         String currentDate = new SimpleDateFormat("MM/dd/yy", Locale.getDefault())
                 .format(Calendar.getInstance().getTime());
@@ -72,15 +83,23 @@ public class VacationDetails extends AppCompatActivity {
         startDateText.setOnClickListener(v -> showDatePicker(startDateText));
         endDateText.setOnClickListener(v -> showDatePicker(endDateText));
 
-        String holidayName = getIntent().getStringExtra("Detail");
-        System.out.println("fromintext" + holidayName);
-        Map<String, String> excursions = Map.of("Swimming","1", "Cycling", "0");
+        String holidayName = getIntent().getStringExtra("title");
+        int vacationId = getIntent().getIntExtra("vacationId", 0);
+        if(vacationId !=0){
+            String hotel = getIntent().getStringExtra("hotel");
+            String startDate = getIntent().getStringExtra("startDate");
+            String endDate = getIntent().getStringExtra("endDate");
+            editTextTitle.setText(holidayName);
+            editTextHotel.setText(hotel);
+            startDateText.setText(startDate);
+            endDateText.setText(endDate);
+        }
+        List<Excursion> excursions = repository.getExcursionListByVacationId(vacationId);
 
         excursionListContainer = findViewById(R.id.excursionListContainer);
-        // Example dynamic vacation list
-        List<String> vacations = Arrays.asList("Miami", "Denver", "Las Vegas", "New York", "Hawaii");
 
-        for (String excursion : excursions.keySet()) {
+
+        for (Excursion excursion : excursions) {
             // Create a horizontal LinearLayout
             LinearLayout horizontalLayout = new LinearLayout(this);
             horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -92,7 +111,7 @@ public class VacationDetails extends AppCompatActivity {
 
             // First TextView (place)
             TextView placeText = new TextView(this);
-            placeText.setText(excursion);
+            placeText.setText(excursion.getTitle());
             placeText.setTextSize(16);
             placeText.setLayoutParams(new LinearLayout.LayoutParams(
                     0,
@@ -102,7 +121,7 @@ public class VacationDetails extends AppCompatActivity {
 
             // Second TextView (extra text)
             TextView extraText = new TextView(this);
-            extraText.setText(excursions.get(excursion));
+            extraText.setText(excursion.getDone());
             extraText.setTextSize(14);
             extraText.setTextColor(Color.GRAY);
             extraText.setLayoutParams(new LinearLayout.LayoutParams(
@@ -113,7 +132,7 @@ public class VacationDetails extends AppCompatActivity {
             // Add click listener on the whole layout
             horizontalLayout.setOnClickListener(v -> {
                 Intent intent = new Intent(this, ExcursionDetails.class);
-                intent.putExtra("excursion", excursion);
+                intent.putExtra("excursionId", excursion.getExcursionId());
                 startActivity(intent);
             });
 
@@ -124,6 +143,27 @@ public class VacationDetails extends AppCompatActivity {
             // Add the horizontal layout to the container
             excursionListContainer.addView(horizontalLayout);
         }
+
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+
+        // Handle back button click
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        toolbar.setOnMenuItemClickListener(item -> {
+            if(R.id.saveVacation == item.getItemId()){
+                if(vacationId==0){
+                    Vacation vacation = new Vacation();
+                    vacation.setTitle(editTextTitle.getText().toString().trim());
+                    vacation.setHotel(editTextHotel.getText().toString().trim());
+                    vacation.setStartDate(startDateText.getText().toString().trim());
+                    vacation.setEndDate(endDateText.getText().toString().trim());
+                    repository.insert(vacation);
+
+                }
+                return  true;
+            }
+            return  false;
+
+        });
 
     }
 
@@ -145,5 +185,11 @@ public class VacationDetails extends AppCompatActivity {
         );
 
         datePickerDialog.show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        System.out.println(item);
+        return super.onOptionsItemSelected(item);
     }
 }
