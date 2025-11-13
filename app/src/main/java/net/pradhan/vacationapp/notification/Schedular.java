@@ -11,10 +11,11 @@ import java.util.Calendar;
 
 public class Schedular {
 
-    public void scheduleToast(Context context, int year, int month, int day, int hour, int minute) {
+    public void scheduleToast(Context context, int year, int month, int day, int hour, int minute,String message) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, ToastReceiver.class);
+        intent.putExtra("toast_message", message); // Pass message here
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );

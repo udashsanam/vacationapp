@@ -9,7 +9,9 @@ import android.widget.Toast;
 public class ToastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Toast.makeText(context.getApplicationContext(), "Scheduled Toast!", Toast.LENGTH_LONG).show();
+        String message = intent.getStringExtra("toast_message");
+        if (message == null) message = "Alarm triggered!";
+        Toast.makeText(context.getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 }
 
