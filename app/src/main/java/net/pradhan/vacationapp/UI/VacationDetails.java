@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -54,14 +55,7 @@ public class VacationDetails extends AppCompatActivity {
             return insets;
         });
 
-        FloatingActionButton fab = findViewById(R.id.floatingActionButton2);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(VacationDetails.this, ExcursionDetails.class);
-                startActivity(intent);
-            }
-        });
+
 
         // handle buttn click
         startDateText = findViewById(R.id.startDateText);
@@ -85,6 +79,20 @@ public class VacationDetails extends AppCompatActivity {
 
         String holidayName = getIntent().getStringExtra("title");
         int vacationId = getIntent().getIntExtra("vacationId", 0);
+
+        FloatingActionButton fab = findViewById(R.id.floatingActionButton2);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (vacationId==0 ) {
+                    Toast.makeText(VacationDetails.this, "Please save vacation details first.", Toast.LENGTH_SHORT).show();
+                    return; // Stop here
+                }
+                Intent intent = new Intent(VacationDetails.this, ExcursionDetails.class);
+                intent.putExtra("vacationId", vacationId);
+                startActivity(intent);
+            }
+        });
         if(vacationId !=0){
             String hotel = getIntent().getStringExtra("hotel");
             String startDate = getIntent().getStringExtra("startDate");
@@ -121,7 +129,7 @@ public class VacationDetails extends AppCompatActivity {
 
             // Second TextView (extra text)
             TextView extraText = new TextView(this);
-            extraText.setText(excursion.getDone());
+            extraText.setText(String.valueOf(excursion.getDone()));
             extraText.setTextSize(14);
             extraText.setTextColor(Color.GRAY);
             extraText.setLayoutParams(new LinearLayout.LayoutParams(
@@ -133,6 +141,7 @@ public class VacationDetails extends AppCompatActivity {
             horizontalLayout.setOnClickListener(v -> {
                 Intent intent = new Intent(this, ExcursionDetails.class);
                 intent.putExtra("excursionId", excursion.getExcursionId());
+                intent.putExtra("vacationId", vacationId);
                 startActivity(intent);
             });
 
@@ -157,7 +166,11 @@ public class VacationDetails extends AppCompatActivity {
                     vacation.setHotel(editTextHotel.getText().toString().trim());
                     vacation.setStartDate(startDateText.getText().toString().trim());
                     vacation.setEndDate(endDateText.getText().toString().trim());
-                    repository.insert(vacation);
+                    if(vacationId ==0){
+                        repository.insert(vacation);
+                    }else {
+                        repository.updateVacation(vacation);
+                    }
                     Intent intent = new Intent(this, VacationList.class);
                     startActivity(intent);
                     finish(); // removes current screen from back stack

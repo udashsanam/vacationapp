@@ -18,13 +18,7 @@ public class Excursion {
 
     private int done;
 
-    public Excursion(int excursionId, String title, int vacationId, String startDate, int done) {
-        this.excursionId = excursionId;
-        this.title = title;
-        this.vacationId = vacationId;
-        this.startDate = startDate;
-        this.done = done;
-    }
+
 
     public int getExcursionId() {
         return excursionId;

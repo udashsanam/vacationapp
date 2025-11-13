@@ -58,8 +58,6 @@ public class VacationList extends AppCompatActivity {
         vacationListContainer = findViewById(R.id.vacationListContainer);
         repository = new Repository(getApplication());
         // Example dynamic vacation list
-//        List<String> vacations = Arrays.asList("Miami", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii"
-//                , "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii", "Denver", "Las Vegas", "New York", "Hawaii");
        List<Vacation> vacations = repository.getVacationList();
 
         for (Vacation place : vacations) {

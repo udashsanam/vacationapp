@@ -19,6 +19,10 @@ public class Repository {
     private List<Vacation> vacationList;
     private List<Excursion> excursionList;
 
+    private Excursion excursion;
+
+    private Vacation vacation;
+
     private static int NUMBER_OF_THREADS = 4;
     static final ExecutorService databaseExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
@@ -118,6 +122,17 @@ public class Repository {
         }catch (InterruptedException e){
             e.printStackTrace();
         }
+    }
+    public Excursion getExcursionById(int excursionId){
+        databaseExecutor.execute(()->{
+            excursion = excursionDAO.getExcursionById(excursionId);
+        });
+        try {
+            Thread.sleep(1000);
+        }catch (InterruptedException ex){
+
+        }
+        return excursion;
     }
 
 }

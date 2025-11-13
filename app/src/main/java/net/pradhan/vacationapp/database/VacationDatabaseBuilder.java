@@ -11,7 +11,7 @@ import net.pradhan.vacationapp.dao.VacationDAO;
 import net.pradhan.vacationapp.entities.Excursion;
 import net.pradhan.vacationapp.entities.Vacation;
 
-@Database(entities = {Vacation.class, Excursion.class}, version = 3,exportSchema = false)
+@Database(entities = {Vacation.class, Excursion.class}, version = 4,exportSchema = false)
 public abstract class VacationDatabaseBuilder extends RoomDatabase {
 
     public abstract VacationDAO vacationDAO();
