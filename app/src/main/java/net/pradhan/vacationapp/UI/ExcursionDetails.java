@@ -69,6 +69,24 @@ public class ExcursionDetails extends AppCompatActivity {
                 }else {
                     repository.updateExcursion(excursion);
                 }
+                Intent intent = new Intent(this, VacationDetails.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("vacationId", vacationId);
+                startActivity(intent);
+                finish(); // removes current screen from back stack
+                return true;
+            }
+            if(item.getItemId() == R.id.deleteExcursion){
+                if(excursionId !=0){
+                    Excursion excursion = new Excursion();
+                    excursion.setExcursionId(excursionId);
+                    repository.delete(excursion);
+                }
+                Intent intent = new Intent(this, VacationDetails.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("vacationId", vacationId);
+                startActivity(intent);
+                finish();
                 return true;
             }
             return false;

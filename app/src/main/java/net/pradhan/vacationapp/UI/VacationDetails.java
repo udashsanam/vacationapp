@@ -77,7 +77,6 @@ public class VacationDetails extends AppCompatActivity {
         startDateText.setOnClickListener(v -> showDatePicker(startDateText));
         endDateText.setOnClickListener(v -> showDatePicker(endDateText));
 
-        String holidayName = getIntent().getStringExtra("title");
         int vacationId = getIntent().getIntExtra("vacationId", 0);
 
         FloatingActionButton fab = findViewById(R.id.floatingActionButton2);
@@ -94,10 +93,11 @@ public class VacationDetails extends AppCompatActivity {
             }
         });
         if(vacationId !=0){
-            String hotel = getIntent().getStringExtra("hotel");
-            String startDate = getIntent().getStringExtra("startDate");
-            String endDate = getIntent().getStringExtra("endDate");
-            editTextTitle.setText(holidayName);
+            Vacation vacation = repository.getVacationById(vacationId);
+            String hotel = vacation.getHotel();
+            String startDate = vacation.getStartDate();
+            String endDate = vacation.getEndDate();
+            editTextTitle.setText(vacation.getTitle());
             editTextHotel.setText(hotel);
             startDateText.setText(startDate);
             endDateText.setText(endDate);
@@ -172,7 +172,8 @@ public class VacationDetails extends AppCompatActivity {
                         repository.updateVacation(vacation);
                     }
                     Intent intent = new Intent(this, VacationList.class);
-                    startActivity(intent);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                     finish(); // removes current screen from back stack
 
 
@@ -184,6 +185,7 @@ public class VacationDetails extends AppCompatActivity {
                     vacation.setVacationId(vacationId);
                     repository.deleteVacation(vacation);
                     Intent intent = new Intent(this, VacationList.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     finish(); // removes current screen from back stack
 

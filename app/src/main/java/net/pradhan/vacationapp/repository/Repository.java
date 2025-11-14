@@ -21,6 +21,7 @@ public class Repository {
 
     private Excursion excursion;
 
+
     private Vacation vacation;
 
     private static int NUMBER_OF_THREADS = 4;
@@ -133,6 +134,17 @@ public class Repository {
 
         }
         return excursion;
+    }
+    public Vacation getVacationById(int vacationId){
+        databaseExecutor.execute(()-> {
+            vacation = vacationDAO.getByVacationId(vacationId);
+        });
+        try {
+            Thread.sleep(1000);
+        }catch (InterruptedException ex){
+
+        }
+        return vacation;
     }
 
 }
