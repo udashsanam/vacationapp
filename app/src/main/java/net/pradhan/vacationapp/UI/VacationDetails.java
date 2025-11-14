@@ -1,6 +1,10 @@
 package net.pradhan.vacationapp.UI;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -190,6 +194,22 @@ public class VacationDetails extends AppCompatActivity {
                     finish(); // removes current screen from back stack
 
                 }
+                return true;
+            }
+            if(R.id.shareDetails == item.getItemId()){
+                Vacation vacation = repository.getVacationById(vacationId);
+                String json = "{\n" +
+                        "  \"vacationId\": " + vacation.getVacationId() + ",\n" +
+                        "  \"title\": \"" + vacation.getTitle() + "\",\n" +
+                        "  \"startDate\": \"" + vacation.getStartDate() + "\",\n" +
+                        "  \"endDate\": \"" + vacation.getEndDate() + "\",\n" +
+                        "  \"hotel\": \"" + vacation.getHotel() + "\"\n" +
+                        "}";
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("text", json);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(this, "Copied on Clipboard!", Toast.LENGTH_SHORT).show();
+//                toolbar.collapseActionView();
                 return true;
             }
             return  false;
