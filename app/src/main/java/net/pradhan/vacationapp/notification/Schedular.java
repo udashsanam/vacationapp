@@ -7,41 +7,40 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Calendar;
+import java.util.Date;
 
 public class Schedular {
 
-    public void scheduleToast(Context context, int year, int month, int day, int hour, int minute,String message) {
+    public void scheduleToast(Context context, int month,int year, int day, String message) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         Intent intent = new Intent(context, ToastReceiver.class);
-        intent.putExtra("toast_message", message); // Pass message here
+        intent.putExtra("toast_message", message);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // Set the exact date and time
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month); // Note: month is 0-based (Jan=0)
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        // Optional: if the time is in the past, adjust or cancel
-        if (calendar.before(Calendar.getInstance())) {
-            // Time is already past
-            return; // or you can schedule for the next day
+        LocalDateTime x = LocalDateTime.of(year, month, day,
+                LocalDateTime.now().getHour(),
+                LocalDateTime.now().getMinute()
+        ).plusMinutes(1);
+        if(LocalDateTime.now().isAfter(x)){
+            return;
         }
+
+        long triggerAt = x.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        System.out.println("Alarm set for: " + new Date(triggerAt));
 
         alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
-                calendar.getTimeInMillis(),
+                x.atZone(ZoneId.systemDefault())
+                        .toInstant()
+                        .toEpochMilli(),
                 pendingIntent
         );
     }
-
 
 }

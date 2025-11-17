@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    //two
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
     <application
@@ -38,6 +39,7 @@
             </intent-filter>
         </activity>
 
+        // one
         <receiver android:name=".notification.ToastReceiver"/>
     </application>
 

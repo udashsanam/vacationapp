@@ -28,9 +28,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import net.pradhan.vacationapp.R;
 import net.pradhan.vacationapp.entities.Excursion;
 import net.pradhan.vacationapp.entities.Vacation;
+import net.pradhan.vacationapp.notification.Schedular;
 import net.pradhan.vacationapp.repository.Repository;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -211,6 +214,26 @@ public class VacationDetails extends AppCompatActivity {
                 Toast.makeText(this, "Copied on Clipboard!", Toast.LENGTH_SHORT).show();
 //                toolbar.collapseActionView();
                 return true;
+            }
+            if(R.id.alert ==item.getItemId()){
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+                LocalDate date = LocalDate.parse(startDateText.getText().toString(), formatter);
+                LocalDate endDate = LocalDate.parse(endDateText.getText().toString(), formatter);
+
+                int month = date.getMonthValue();
+                int day = date.getDayOfMonth();
+                int year = date.getYear();
+
+                int endMonth = endDate.getMonthValue();
+                int endDay = endDate.getDayOfMonth();
+                int endYear = endDate.getYear();
+
+                Schedular schedular = new Schedular();
+
+                schedular.scheduleToast(getApplicationContext(),month,year,day, editTextTitle.getText().toString() + " started!!");
+                schedular.scheduleToast(getApplicationContext(),endMonth,endYear,endDay, editTextTitle.getText().toString() + " ended!!");
+
+                return  true;
             }
             return  false;
 
