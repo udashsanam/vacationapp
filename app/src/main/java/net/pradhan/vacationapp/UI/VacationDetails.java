@@ -136,7 +136,7 @@ public class VacationDetails extends AppCompatActivity {
 
             // Second TextView (extra text)
             TextView extraText = new TextView(this);
-            extraText.setText(String.valueOf(excursion.getDone()));
+            extraText.setText(String.valueOf(excursion.getStartDate()));
             extraText.setTextSize(14);
             extraText.setTextColor(Color.GRAY);
             extraText.setLayoutParams(new LinearLayout.LayoutParams(
