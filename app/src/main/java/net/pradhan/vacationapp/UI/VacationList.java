@@ -5,11 +5,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -22,6 +25,7 @@ import net.pradhan.vacationapp.R;
 import net.pradhan.vacationapp.entities.Vacation;
 import net.pradhan.vacationapp.repository.Repository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +34,8 @@ public class VacationList extends AppCompatActivity {
 
     LinearLayout vacationListContainer;
     Repository repository;
+
+    List<Vacation> vacations;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +45,13 @@ public class VacationList extends AppCompatActivity {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
+        });
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+        toolbar.setOnMenuItemClickListener(item -> {
+            if(item.getItemId() == R.id.action_search){
+                openSearchDialog();
+            }
+            return false;
         });
 
         FloatingActionButton fab = findViewById(R.id.floatingActionButton);
@@ -50,7 +63,6 @@ public class VacationList extends AppCompatActivity {
             }
         });
 
-        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
 
         // Handle back button click
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
@@ -58,31 +70,18 @@ public class VacationList extends AppCompatActivity {
         vacationListContainer = findViewById(R.id.vacationListContainer);
         repository = new Repository(getApplication());
         // Example dynamic vacation list
-       List<Vacation> vacations = repository.getVacationList();
+        String search = getIntent().getStringExtra("search");
 
-        for (Vacation place : vacations) {
-            TextView textView = new TextView(this);
-            textView.setText(place.getTitle());
-            textView.setTextSize(16);
-            textView.setPadding(0, 8, 0, 8);
-            textView.setOnClickListener(v -> {
-                Intent intent = new Intent(this, VacationDetails.class);
-                intent.putExtra("vacationId", place.getVacationId());
-                intent.putExtra("title", place.getTitle());
-                intent.putExtra("hotel", place.getHotel());
-                intent.putExtra("startDate", place.getStartDate());
-                intent.putExtra("endDate", place.getEndDate());
-                startActivity(intent);
-            });
-            vacationListContainer.addView(textView);
-        }
+        vacations = repository.getVacationList();
+        displayVacations(vacations);
+
         System.out.println(getIntent().getStringExtra("test"));
     }
 
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_vacation_list, menu);
-        return true;
-    }
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.menu_vacation_list, menu);
+//        return true;
+//    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId()==R.id.saveExcursion) {
@@ -97,4 +96,47 @@ public class VacationList extends AppCompatActivity {
         }
         return true;
     }
+
+    private void openSearchDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Search Excursion");
+
+        final EditText input = new EditText(this);
+        input.setHint("Type to search...");
+        builder.setView(input);
+
+        builder.setPositiveButton("Search", (dialog, which) -> {
+            String query = input.getText().toString();
+            this.vacations =this.repository.searchVacation(query);
+            this.displayVacations(this.vacations);
+
+        });
+
+        builder.setNegativeButton("Cancel", null);
+        builder.show();
+    }
+    private void displayVacations(List<Vacation> list) {
+        vacationListContainer.removeAllViews(); // 🔥 clear old list
+
+        for (Vacation place : list) {
+            TextView textView = new TextView(this);
+            textView.setText(place.getTitle());
+            textView.setTextSize(16);
+            textView.setPadding(0, 8, 0, 8);
+
+            textView.setOnClickListener(v -> {
+                Intent intent = new Intent(this, VacationDetails.class);
+                intent.putExtra("vacationId", place.getVacationId());
+                intent.putExtra("title", place.getTitle());
+                intent.putExtra("hotel", place.getHotel());
+                intent.putExtra("startDate", place.getStartDate());
+                intent.putExtra("endDate", place.getEndDate());
+                startActivity(intent);
+            });
+
+            vacationListContainer.addView(textView);
+        }
+    }
+
+
 }

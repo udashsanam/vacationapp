@@ -147,4 +147,16 @@ public class Repository {
         return vacation;
     }
 
+    public List<Vacation> searchVacation(String query) {
+        databaseExecutor.execute(() -> {
+            vacationList = vacationDAO.searchVacation(query);
+        });
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return vacationList;
+    }
 }
