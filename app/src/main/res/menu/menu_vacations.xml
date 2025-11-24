@@ -6,4 +6,8 @@
         android:id="@+id/action_search"
         android:title="Search"
 />
+    <item
+        android:id="@+id/report"
+        android:title="Generate Report"
+        />
 </menu>
