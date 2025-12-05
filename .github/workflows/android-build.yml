@@ -3,22 +3,14 @@ name: Build APK
 on:
   push:
     branches:
-      - '**'   # Trigger on push to any branch
-  pull_request:
-    branches:
       - '**'
 
 jobs:
   build:
-    name: Build APK
     runs-on: ubuntu-latest
 
-    env:
-      JAVA_HOME: /usr/lib/jvm/java-11-openjdk
-      ANDROID_SDK_ROOT: /usr/local/android-sdk
-
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Set up JDK 11
@@ -27,21 +19,28 @@ jobs:
           distribution: temurin
           java-version: 11
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v2
-        with:
-          api-level: 36
-          build-tools: 36.0.0
-          cmake: false
-          ndk: false
+      - name: Download Android SDK tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip wget
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          mkdir -p $HOME/Android/cmdline-tools
+          unzip cmdline-tools.zip -d $HOME/Android/cmdline-tools
+          mv $HOME/Android/cmdline-tools/cmdline-tools $HOME/Android/cmdline-tools/latest
+          yes | $HOME/Android/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/Android "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-      - name: Grant execute permission for gradlew
+      - name: Set environment variables
+        run: |
+          echo "ANDROID_HOME=$HOME/Android" >> $GITHUB_ENV
+          echo "$HOME/Android/platform-tools" >> $GITHUB_PATH
+
+      - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       - name: Build APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew clean assembleRelease
 
-      - name: Upload APK as artifact
+      - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
           name: vacationapp-release-apk
