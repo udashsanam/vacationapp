@@ -1,23 +1,58 @@
 package net.pradhan.vacationapp.UI;
 
+import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import net.pradhan.vacationapp.R;
+import net.pradhan.vacationapp.entities.Excursion;
+import net.pradhan.vacationapp.entities.Vacation;
+import net.pradhan.vacationapp.notification.Schedular;
+import net.pradhan.vacationapp.repository.Repository;
+
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 public class VacationDetails extends AppCompatActivity {
 
+    TextView startDateText, endDateText;
+
+    EditText editTextTitle,editTextHotel;
+    LinearLayout excursionListContainer;
+
+    Repository repository;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        repository = new Repository(getApplication());
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_vacation_details);
@@ -27,13 +62,208 @@ public class VacationDetails extends AppCompatActivity {
             return insets;
         });
 
+
+
+        // handle buttn click
+        startDateText = findViewById(R.id.startDateText);
+        endDateText = findViewById(R.id.endDateText);
+        editTextTitle = findViewById(R.id.titletext);
+        editTextHotel = findViewById(R.id.hotelText);
+        // 🗓️ Set current date by default
+        String currentDate = new SimpleDateFormat("MM/dd/yy", Locale.getDefault())
+                .format(Calendar.getInstance().getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, 1); // add 1 day
+
+        String tomorrowDate = new SimpleDateFormat("MM/dd/yy", Locale.getDefault())
+                .format(calendar.getTime());
+
+        startDateText.setText(currentDate);
+        endDateText.setText(tomorrowDate);
+
+        startDateText.setOnClickListener(v -> showDatePicker(startDateText));
+        endDateText.setOnClickListener(v -> showDatePicker(endDateText));
+
+        int vacationId = getIntent().getIntExtra("vacationId", 0);
+
         FloatingActionButton fab = findViewById(R.id.floatingActionButton2);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(VacationDetails.this, HotelDetails.class);
+                if (vacationId==0 ) {
+                    Toast.makeText(VacationDetails.this, "Please save vacation details first.", Toast.LENGTH_SHORT).show();
+                    return; // Stop here
+                }
+                Intent intent = new Intent(VacationDetails.this, ExcursionDetails.class);
+                intent.putExtra("vacationId", vacationId);
                 startActivity(intent);
             }
         });
+        if(vacationId !=0){
+            Vacation vacation = repository.getVacationById(vacationId);
+            String hotel = vacation.getHotel();
+            String startDate = vacation.getStartDate();
+            String endDate = vacation.getEndDate();
+            editTextTitle.setText(vacation.getTitle());
+            editTextHotel.setText(hotel);
+            startDateText.setText(startDate);
+            endDateText.setText(endDate);
+        }
+        List<Excursion> excursions = repository.getExcursionListByVacationId(vacationId);
+
+        excursionListContainer = findViewById(R.id.excursionListContainer);
+
+
+        for (Excursion excursion : excursions) {
+            // Create a horizontal LinearLayout
+            LinearLayout horizontalLayout = new LinearLayout(this);
+            horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
+            horizontalLayout.setPadding(0, 8, 0, 8);
+            horizontalLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+
+            // First TextView (place)
+            TextView placeText = new TextView(this);
+            placeText.setText(excursion.getTitle());
+            placeText.setTextSize(16);
+            placeText.setLayoutParams(new LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1f // take remaining space
+            ));
+
+            // Second TextView (extra text)
+            TextView extraText = new TextView(this);
+            extraText.setText(String.valueOf(excursion.getStartDate()));
+            extraText.setTextSize(14);
+            extraText.setTextColor(Color.GRAY);
+            extraText.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+
+            // Add click listener on the whole layout
+            horizontalLayout.setOnClickListener(v -> {
+                Intent intent = new Intent(this, ExcursionDetails.class);
+                intent.putExtra("excursionId", excursion.getExcursionId());
+                intent.putExtra("vacationId", vacationId);
+                startActivity(intent);
+            });
+
+            // Add both TextViews to the horizontal layout
+            horizontalLayout.addView(placeText);
+            horizontalLayout.addView(extraText);
+
+            // Add the horizontal layout to the container
+            excursionListContainer.addView(horizontalLayout);
+        }
+
+        MaterialToolbar toolbar = findViewById(R.id.topAppBar);
+
+        // Handle back button click
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        toolbar.setOnMenuItemClickListener(item -> {
+            if(R.id.saveVacation == item.getItemId()){
+
+                    Vacation vacation = new Vacation();
+                    vacation.setVacationId(vacationId);
+                    vacation.setTitle(editTextTitle.getText().toString().trim());
+                    vacation.setHotel(editTextHotel.getText().toString().trim());
+                    vacation.setStartDate(startDateText.getText().toString().trim());
+                    vacation.setEndDate(endDateText.getText().toString().trim());
+                    if(vacationId ==0){
+                        repository.insert(vacation);
+                    }else {
+                        repository.updateVacation(vacation);
+                    }
+                    Intent intent = new Intent(this, VacationList.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                    finish(); // removes current screen from back stack
+
+
+                return  true;
+            }
+            if(R.id.deleteVacation == item.getItemId()){
+                if(vacationId!=0){
+                    Vacation vacation = new Vacation();
+                    vacation.setVacationId(vacationId);
+                    repository.deleteVacation(vacation);
+                    Intent intent = new Intent(this, VacationList.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish(); // removes current screen from back stack
+
+                }
+                return true;
+            }
+            if(R.id.shareDetails == item.getItemId()){
+                Vacation vacation = repository.getVacationById(vacationId);
+                String json = "{\n" +
+                        "  \"vacationId\": " + vacation.getVacationId() + ",\n" +
+                        "  \"title\": \"" + vacation.getTitle() + "\",\n" +
+                        "  \"startDate\": \"" + vacation.getStartDate() + "\",\n" +
+                        "  \"endDate\": \"" + vacation.getEndDate() + "\",\n" +
+                        "  \"hotel\": \"" + vacation.getHotel() + "\"\n" +
+                        "}";
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText("text", json);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(this, "Copied on Clipboard!", Toast.LENGTH_SHORT).show();
+//                toolbar.collapseActionView();
+                return true;
+            }
+            if(R.id.alert ==item.getItemId()){
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+                LocalDate date = LocalDate.parse(startDateText.getText().toString(), formatter);
+                LocalDate endDate = LocalDate.parse(endDateText.getText().toString(), formatter);
+
+                int month = date.getMonthValue();
+                int day = date.getDayOfMonth();
+                int year = date.getYear();
+
+                int endMonth = endDate.getMonthValue();
+                int endDay = endDate.getDayOfMonth();
+                int endYear = endDate.getYear();
+
+                Schedular schedular = new Schedular();
+
+                schedular.scheduleToast(getApplicationContext(),month,year,day, editTextTitle.getText().toString() + " started!!");
+                schedular.scheduleToast(getApplicationContext(),endMonth,endYear,endDay, editTextTitle.getText().toString() + " ended!!");
+
+                return  true;
+            }
+            return  false;
+
+        });
+
+    }
+
+    private void showDatePicker(TextView targetView) {
+        final Calendar calendar = Calendar.getInstance();
+
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    String formattedDate = String.format("%02d/%02d/%02d",
+                            selectedMonth + 1, selectedDay, selectedYear % 100);
+                    targetView.setText(formattedDate);
+                },
+                year, month, day
+        );
+
+        datePickerDialog.show();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        System.out.println(item);
+        return super.onOptionsItemSelected(item);
     }
 }

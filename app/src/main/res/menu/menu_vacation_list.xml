@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Add Sample Code"
-        android:id="@+id/mysample"/>
-    <item android:title="Item"
-        android:id="@+id/item"/>
+    <item android:title="Save Vacation"
+        android:id="@+id/saveVacation"/>
+    <item android:title="Delete vacation"
+        android:id="@+id/deleteVacation"/>
+    <item android:title="Alert"
+        android:id="@+id/alert"/>
+    <item android:title="Share Details"
+        android:id="@+id/shareDetails"/>
 </menu>
