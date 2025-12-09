@@ -2,7 +2,8 @@ name: Run test
 
 on:
   pull_request:
-    branches: [main]
+    branches: [mains]
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,14 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup JDK 11
-        uses: action/setup-jav@v4
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
         with:
-          distribution: 'termurin'
-          java-version: 11
+          distribution: 'temurin'
+          java-version: 17
           cache: 'gradle'
-      - name: Grant execute permissions for gradlew
+
+      - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Run unit tests
-        run: ./gradlew clean testDebug
+      - name: Run unit tests (Android)
+        run: ./gradlew clean testDebugUnitTest

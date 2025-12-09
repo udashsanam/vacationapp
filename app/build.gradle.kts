@@ -17,10 +17,20 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        create("release") {
+            storeFile = file("vacation-app.jks")     // path to your keystore
+            storePassword = "Admin@123"
+            keyAlias = "key0"
+            keyPassword = "Admin@123"
+        }
+    }
+
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
