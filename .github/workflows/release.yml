@@ -51,14 +51,15 @@ jobs:
       # -----------------------
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > release-key.jks
+          mkdir -p app
+          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > app/release-key.jks
 
       # -----------------------
       # Create keystore.properties
       # -----------------------
       - name: Create keystore.properties
         run: |
-          echo "storeFile=release-key.jks" >> keystore.properties
+          echo "storeFile=app/release-key.jks" >> keystore.properties
           echo "storePassword=${{ secrets.RELEASE_STORE_PASSWORD }}" >> keystore.properties
           echo "keyAlias=${{ secrets.RELEASE_KEY_ALIAS }}" >> keystore.properties
           echo "keyPassword=${{ secrets.RELEASE_KEY_PASSWORD }}" >> keystore.properties
