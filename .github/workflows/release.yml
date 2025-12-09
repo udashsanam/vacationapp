@@ -64,7 +64,7 @@ jobs:
           echo "keyPassword=${{ secrets.RELEASE_KEY_PASSWORD }}" >> keystore.properties
 
       - name: Build Signed APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease -Pandroid.injected.signing.store.file=release-key.jks -Pandroid.injected.signing.store.password=${{ secrets.RELEASE_STORE_PASSWORD }} -Pandroid.injected.signing.key.alias=${{ secrets.RELEASE_KEY_ALIAS }} -Pandroid.injected.signing.key.password=${{ secrets.RELEASE_KEY_PASSWORD }}
 
       - name: 📦 Upload APK Artifact
         uses: actions/upload-artifact@v4 # Use the latest version
