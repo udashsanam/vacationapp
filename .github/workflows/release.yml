@@ -63,11 +63,11 @@ jobs:
           echo "keyAlias=${{ secrets.RELEASE_KEY_ALIAS }}" >> keystore.properties
           echo "keyPassword=${{ secrets.RELEASE_KEY_PASSWORD }}" >> keystore.properties
 
-      # -----------------------
-      # Build AAB + APK
-      # -----------------------
-      - name: Build Signed AAB
-        run: ./gradlew clean bundleRelease
-
       - name: Build Signed APK
         run: ./gradlew assembleRelease
+
+      - name: 📦 Upload APK Artifact
+        uses: actions/upload-artifact@v4 # Use the latest version
+        with:
+          name: release-apk
+          path: app/build/outputs/apk/release/app-release.apk
